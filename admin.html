@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | Our Bangla Shop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Robots Tag: যাতে গুগল এই পেজটি ইনডেক্স না করে -->
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --primary: #FF6B00; --dark: #1e1e2d; --light: #f5f8fa; --white: #ffffff; --danger: #ff4757; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--light); display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar { width: 250px; background: var(--dark); color: white; padding: 20px; position: fixed; height: 100%; transition: 0.3s; z-index: 100; }
+        .brand { font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-bottom: 30px; display: block; text-decoration: none; }
+        .menu-item { display: flex; align-items: center; padding: 12px 15px; color: #a2a3b7; cursor: pointer; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; }
+        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); color: white; }
+        .menu-item i { margin-right: 15px; width: 20px; }
+
+        /* Content */
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 1.8rem; font-weight: 700; color: #333; }
+        
+        /* Cards */
+        .card { background: var(--white); border-radius: 12px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #e1e1e1; border-radius: 8px; outline: none; }
+        .form-input:focus { border-color: var(--primary); }
+        
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn-danger { background: var(--danger); color: white; padding: 8px 12px; font-size: 0.8rem; }
+
+        /* List Items */
+        .item-list { display: flex; flex-direction: column; gap: 10px; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; padding: 10px; }
+            .brand span, .menu-item span { display: none; }
+            .main-content { margin-left: 70px; padding: 15px; }
+            .sidebar .brand { font-size: 1.2rem; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="#" class="brand"><i class="fas fa-shopping-bag"></i> <span>OB Admin</span></a>
+        <div class="menu-item active" onclick="showSection('products')">
+            <i class="fas fa-box"></i> <span>Products</span>
+        </div>
+        <div class="menu-item" onclick="showSection('categories')">
+            <i class="fas fa-th-large"></i> <span>Categories</span>
+        </div>
+        <div class="menu-item" onclick="showSection('sliders')">
+            <i class="fas fa-images"></i> <span>Slider</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title" id="pageTitle">Products</h1>
+        </div>
+
+        <!-- PRODUCTS SECTION -->
+        <div id="section-products" class="admin-section">
+            <div class="card">
+                <h3>Add New Product</h3>
+                <br>
+                <div class="form-group">
+                    <label class="form-label">Product Name</label>
+                    <input type="text" id="pName" class="form-input" placeholder="e.g. Wireless Headphone">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select id="pCategory" class="form-input">
+                        <option value="">Loading Categories...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Price (TK)</label>
+                    <input type="number" id="pPrice" class="form-input" placeholder="e.g. 1200">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Image URL (Direct Link)</label>
+                    <input type="text" id="pImg" class="form-input" placeholder="https://i.postimg.cc/...">
+                </div>
+                <button class="btn btn-primary" onclick="addProduct()">Publish Product</button>
+            </div>
+            
+            <h3>Product List</h3>
+            <div id="pList" class="item-list"></div>
+        </div>
+
+        <!-- CATEGORIES SECTION -->
+        <div id="section-categories" class="admin-section" style="display: none;">
+            <div class="card">
+                <h3>Add Category</h3>
+                <br>
+                <div class="form-group">
+                    <label class="form-label">Category Name (e.g., Mobile)</label>
+                    <input type="text" id="catName" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Icon Class (FontAwesome)</label>
+                    <input type="text" id="catIcon" class="form-input" placeholder="e.g. fas fa-mobile-alt">
+                    <small style="color: #888;">Use classes from FontAwesome (e.g., fas fa-tshirt)</small>
+                </div>
+                <button class="btn btn-primary" onclick="addCategory()">Add Category</button>
+            </div>
+
+            <h3>Active Categories</h3>
+            <div id="catList" class="item-list"></div>
+        </div>
+
+        <!-- SLIDER SECTION -->
+        <div id="section-sliders" class="admin-section" style="display: none;">
+            <div class="card">
+                <h3>Add Slider Image</h3>
+                <br>
+                <div class="form-group">
+                    <label class="form-label">Image URL (Direct Link)</label>
+                    <input type="text" id="slideUrl" class="form-input" placeholder="https://...">
+                </div>
+                <button class="btn btn-primary" onclick="addSlide()">Add Slide</button>
+            </div>
+
+            <h3>Active Slides</h3>
+            <div id="slideList" class="item-list"></div>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // --- FIREBASE CONFIGURATION ---
+        // TODO: Paste your Firebase Config Here (Same as index.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyC5nie4hrbrshqHJZdoLC2kAf4nJZsBXg8",
+            authDomain: "my-bangla-shop.firebaseapp.com",
+            projectId: "my-bangla-shop",
+            storageBucket: "my-bangla-shop.firebasestorage.app",
+            messagingSenderId: "130823389568",
+            appId: "1:130823389568:web:d5fb3b217da6af43058165"
+        };
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+
+            // 1. Categories (Loads List + Dropdown)
+            db.collection("categories").onSnapshot(snap => {
+                const list = document.getElementById('catList');
+                const dropdown = document.getElementById('pCategory');
+                
+                list.innerHTML = "";
+                dropdown.innerHTML = '<option value="">Select Category...</option>';
+
+                if(snap.empty){
+                    list.innerHTML = "<p>No categories found. Add one!</p>";
+                }
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    // Update Dropdown
+                    dropdown.innerHTML += `<option value="${d.name}">${d.name}</option>`;
+                    // Update List
+                    list.innerHTML += `
+                        <div class="list-item">
+                            <div><b>${d.name}</b> <br><small>${d.icon}</small></div>
+                            <button class="btn btn-danger" onclick="deleteItem('categories', '${doc.id}')"><i class="fas fa-trash"></i></button>
+                        </div>`;
+                });
+            });
+
+            // 2. Products
+            db.collection("products").onSnapshot(snap => {
+                const list = document.getElementById('pList');
+                list.innerHTML = "";
+                if(snap.empty){
+                    list.innerHTML = "<p>No products found.</p>";
+                }
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    list.innerHTML += `
+                        <div class="list-item">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <img src="${d.image}" style="width:40px; height:40px; border-radius:5px; object-fit:cover;">
+                                <div><b>${d.name}</b><br><small>Cat: ${d.category} | ৳${d.price}</small></div>
+                            </div>
+                            <button class="btn btn-danger" onclick="deleteItem('products', '${doc.id}')">Remove</button>
+                        </div>`;
+                });
+            });
+
+            // 3. Slider
+            db.collection("slider").onSnapshot(snap => {
+                const list = document.getElementById('slideList');
+                list.innerHTML = "";
+                snap.forEach(doc => {
+                    list.innerHTML += `
+                        <div class="list-item">
+                            <img src="${doc.data().url}" style="height:40px;">
+                            <button class="btn btn-danger" onclick="deleteItem('slider', '${doc.id}')"><i class="fas fa-trash"></i></button>
+                        </div>`;
+                });
+            });
+
+            // --- FUNCTIONS ---
+            window.addProduct = () => {
+                const name = document.getElementById('pName').value;
+                const cat = document.getElementById('pCategory').value;
+                const price = document.getElementById('pPrice').value;
+                const img = document.getElementById('pImg').value;
+
+                if(name && cat && price) {
+                    db.collection("products").add({
+                        name: name, category: cat, price: price, image: img || "https://via.placeholder.com/150"
+                    }).then(() => {
+                        alert('Product Added');
+                        document.getElementById('pName').value = "";
+                        document.getElementById('pPrice').value = "";
+                        document.getElementById('pImg').value = "";
+                    });
+                } else { alert("Please fill Name, Category & Price"); }
+            };
+
+            window.addCategory = () => {
+                const name = document.getElementById('catName').value;
+                const icon = document.getElementById('catIcon').value;
+                if(name) {
+                    db.collection("categories").add({name, icon: icon || 'fas fa-circle'}).then(() => {
+                        document.getElementById('catName').value = "";
+                    });
+                }
+            };
+
+            window.addSlide = () => {
+                const url = document.getElementById('slideUrl').value;
+                if(url) db.collection("slider").add({url}).then(() => document.getElementById('slideUrl').value="");
+            };
+
+            window.deleteItem = (col, id) => {
+                if(confirm("Are you sure?")) db.collection(col).doc(id).delete();
+            };
+
+        } catch (e) { console.error("Firebase Error"); }
+
+        // --- UI NAVIGATION ---
+        window.showSection = (sec) => {
+            document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'none');
+            document.getElementById('section-'+sec).style.display = 'block';
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById('pageTitle').innerText = sec.charAt(0).toUpperCase() + sec.slice(1);
+        };
+    </script>
+</body>
+</html>
