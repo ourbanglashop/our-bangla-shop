@@ -377,7 +377,11 @@
                 document.getElementById('slider').style.transform = `translateX(-${i * 100}%)`;
             }, 3000);
         }
-
+document.getElementById('searchInput').addEventListener('keyup', function(e) {
+        const searchText = e.target.value.toLowerCase();
+        const filteredProducts = allProducts.filter(p => p.name.toLowerCase().includes(searchText));
+        renderProducts(filteredProducts);
+    });
         window.onload = () => { updateLanguage(); loadData(); };
     </script>
 </body>
